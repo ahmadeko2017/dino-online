@@ -155,7 +155,10 @@ export class Game {
     }
 
     bindEvents() {
-        // Keyboard inputs
+        // Mobile detection
+        this.isMobile = this.detectMobile();
+        
+        // Keyboard inputs (Desktop)
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 if (this.gameOver) {
@@ -187,6 +190,99 @@ export class Game {
                 if (this.dino) this.dino.duck(false);
             }
         });
+
+        // ========== MOBILE TOUCH CONTROLS ==========
+        
+        // Touch on canvas - tap anywhere to jump
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            if (this.gameOver) {
+                if (this.isGlobalGameOver) return;
+                const startScreen = document.getElementById('start-screen');
+                const lobbyScreen = document.getElementById('lobby-screen');
+                if (startScreen && lobbyScreen) {
+                    if (startScreen.classList.contains('hidden') && lobbyScreen.classList.contains('hidden')) {
+                        this.start();
+                    }
+                }
+            } else if (this.dino) {
+                // Get touch position relative to canvas
+                const rect = this.canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const touchY = touch.clientY - rect.top;
+                const canvasHeightScaled = rect.height;
+                
+                // Touch on bottom third = duck, otherwise jump
+                if (touchY > canvasHeightScaled * 0.7) {
+                    this.dino.duck(true);
+                } else {
+                    if (this.dino.jump()) {
+                        this.audio.playSound('JUMP');
+                    }
+                }
+            }
+        }, { passive: false });
+
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            // Release duck when touch ends
+            if (this.dino) {
+                this.dino.duck(false);
+            }
+        }, { passive: false });
+
+        // On-screen button controls (Mobile)
+        const btnJump = document.getElementById('btn-jump');
+        const btnDuck = document.getElementById('btn-duck');
+        
+        if (btnJump) {
+            // Use touchstart for faster response on mobile
+            btnJump.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (this.dino && !this.gameOver) {
+                    if (this.dino.jump()) {
+                        this.audio.playSound('JUMP');
+                    }
+                }
+            }, { passive: false });
+            
+            // Fallback for mouse clicks
+            btnJump.addEventListener('click', (e) => {
+                if (this.dino && !this.gameOver) {
+                    if (this.dino.jump()) {
+                        this.audio.playSound('JUMP');
+                    }
+                }
+            });
+        }
+        
+        if (btnDuck) {
+            btnDuck.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (this.dino && !this.gameOver) {
+                    this.dino.duck(true);
+                }
+            }, { passive: false });
+            
+            btnDuck.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (this.dino) {
+                    this.dino.duck(false);
+                }
+            }, { passive: false });
+            
+            // Mouse fallback
+            btnDuck.addEventListener('mousedown', () => {
+                if (this.dino && !this.gameOver) this.dino.duck(true);
+            });
+            btnDuck.addEventListener('mouseup', () => {
+                if (this.dino) this.dino.duck(false);
+            });
+            btnDuck.addEventListener('mouseleave', () => {
+                if (this.dino) this.dino.duck(false);
+            });
+        }
 
         // --- UI EVENT BINDINGS ---
         const startScreen = document.getElementById('start-screen');
@@ -339,6 +435,25 @@ export class Game {
         }
     }
 
+    // Detect if user is on mobile device
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            || ('ontouchstart' in window) 
+            || (navigator.maxTouchPoints > 0);
+    }
+
+    // Show/hide mobile controls
+    showMobileControls(show) {
+        const mobileControls = document.getElementById('mobile-controls');
+        if (mobileControls) {
+            if (show && this.isMobile) {
+                mobileControls.classList.remove('hidden');
+            } else {
+                mobileControls.classList.add('hidden');
+            }
+        }
+    }
+
     start() {
         if (this.frameId) {
             cancelAnimationFrame(this.frameId);
@@ -352,6 +467,9 @@ export class Game {
         this.isDarkMode = false;
         document.body.classList.remove('dark-mode');
         this.obstacleManager = new ObstacleManager();
+        
+        // Show mobile controls when game starts
+        this.showMobileControls(true);
         
         requestAnimationFrame((time) => {
             this.lastTime = time;
