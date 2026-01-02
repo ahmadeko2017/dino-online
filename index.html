@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Dino Clone - Multiplayer</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="game" width="600" height="150"></canvas>
+    </div>
+    
+    <!-- Start Screen Overlay -->
+    <div id="start-screen" class="screen show">
+        <h1 class="title">🦕 CHROME DINO</h1>
+        <div class="menu">
+            <button id="btn-solo" class="retro-btn">🏃 SOLO RUN</button>
+            <button id="btn-multi" class="retro-btn">👥 MULTIPLAYER</button>
+        </div>
+        <p class="footer">Ver 1.0 • Press SPACE to jump</p>
+    </div>
+
+    <!-- Multiplayer Lobby Overlay -->
+    <div id="lobby-screen" class="screen hidden">
+        <h2 class="subtitle">👥 MULTIPLAYER LOBBY</h2>
+        <div class="lobby-controls">
+            <button id="btnCreate" class="retro-btn">🏠 CREATE ROOM</button>
+            <p class="status-text">— OR JOIN EXISTING —</p>
+            <div class="join-row">
+                <input type="text" id="inpRoom" class="retro-input" placeholder="CODE" maxlength="4">
+                <button id="btnJoin" class="retro-btn small">JOIN</button>
+            </div>
+            <p id="roomStatus" class="status-text"></p>
+        </div>
+        <button id="btn-back" class="retro-btn small">← BACK</button>
+    </div>
+
+    <!-- Waiting Room -->
+    <div id="waiting-room" class="screen hidden">
+        <h2 class="subtitle">⏳ WAITING ROOM</h2>
+        <p id="waitingRoomId" class="room-id-display">ROOM: ----</p>
+        <div class="players-status">
+            <div class="player-slot">
+                <span class="player-label">YOU</span>
+                <span id="p1Status" class="ready-status">⏳</span>
+            </div>
+            <div class="player-slot">
+                <span class="player-label">OPPONENT</span>
+                <span id="p2Status" class="ready-status">❌</span>
+            </div>
+        </div>
+        <button id="btnReady" class="retro-btn ready-btn">✓ READY!</button>
+        <div class="chat-panel">
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input-row">
+                <input type="text" id="chatInput" class="retro-input chat-input" placeholder="Type message...">
+                <button id="btnSendChat" class="retro-btn small">SEND</button>
+            </div>
+        </div>
+        <button id="btnLeaveRoom" class="retro-btn small danger">✕ LEAVE</button>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameover-screen" class="screen hidden gameover-overlay">
+        <div id="resultIcon" class="result-icon">🏆</div>
+        <h2 id="resultText" class="result-text">YOU WIN!</h2>
+        <p id="resultScores" class="result-scores">1200 vs 850</p>
+        <div class="gameover-buttons">
+            <button id="btnRematch" class="retro-btn">🔄 PLAY AGAIN</button>
+            <button id="btnExit" class="retro-btn danger">✕ EXIT</button>
+        </div>
+        <p id="rematchStatus" class="status-text"></p>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
